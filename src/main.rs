@@ -16,12 +16,6 @@ fn main() {
     let args = Args::parse();
     let stdin = std::io::stdin();
 
-
-
-
-
-
-
     for line in stdin.lock().lines() {
         let line = line.unwrap();
 
