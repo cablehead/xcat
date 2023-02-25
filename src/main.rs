@@ -15,16 +15,25 @@ struct Args {
 fn main() {
     let args = Args::parse();
     let stdin = std::io::stdin();
+
+
+
+
+
+
+
     for line in stdin.lock().lines() {
         let line = line.unwrap();
-        let mut child = std::process::Command::new(&args.command)
+
+        let mut p = std::process::Command::new(&args.command)
             .args(&args.args)
             .stdin(std::process::Stdio::piped())
             .spawn()
             .unwrap();
-        {
-            let mut stdin = child.stdin.take().unwrap();
-            stdin.write_all(line.as_bytes()).unwrap();
-        }
+
+        let mut stdin = p.stdin.take().unwrap();
+        writeln!(stdin, "{}", line).unwrap();
+        drop(stdin);
+        p.wait().unwrap();
     }
 }
