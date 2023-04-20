@@ -1,4 +1,5 @@
 use std::io::BufRead;
+use std::io::Read;
 use std::io::Write;
 
 use clap::Parser;
@@ -32,7 +33,7 @@ fn spawn_command<I: IntoIterator<Item = String>>(args: &Args, chunks: I) {
 
 fn main() {
     let args = Args::parse();
-    let stdin = std::io::stdin();
+    let mut stdin = std::io::stdin();
 
     let _bpe = cl100k_base().unwrap();
 
