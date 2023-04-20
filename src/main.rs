@@ -17,18 +17,18 @@ struct Args {
 }
 
 fn spawn_command<I: IntoIterator<Item = String>>(args: &Args, chunks: I) {
-    let mut p = std::process::Command::new(&args.command)
-        .args(&args.args)
-        .stdin(std::process::Stdio::piped())
-        .spawn()
-        .unwrap();
-
-    let mut stdin = p.stdin.take().unwrap();
     for chunk in chunks {
+        let mut p = std::process::Command::new(&args.command)
+            .args(&args.args)
+            .stdin(std::process::Stdio::piped())
+            .spawn()
+            .unwrap();
+
+        let mut stdin = p.stdin.take().unwrap();
         writeln!(stdin, "{}", chunk).unwrap();
+        drop(stdin);
+        p.wait().unwrap();
     }
-    drop(stdin);
-    p.wait().unwrap();
 }
 
 fn main() {
