@@ -1,20 +1,23 @@
 use std::process::{Command, Stdio};
+use std::io::Write;
 
 #[test]
 fn test_program() {
     let input = "Hello, world!";
-    let output = Command::new(env!("CARGO_BIN_EXE_xcat"))
+    let mut child = Command::new(env!("CARGO_BIN_EXE_xcat"))
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
-        .arg("echo")
+        .arg("cat")
         .spawn()
-        .unwrap()
-        .stdin
-        .unwrap()
-        .write_all(input.as_bytes())
         .unwrap();
 
+    child.stdin.as_mut().unwrap().write_all(input.as_bytes()).unwrap();
+    let output = child.wait_with_output().unwrap();
+
     let expected_output = format!("{}\n", input);
+
+    println!("Expected output: {:?}", expected_output);
+    println!("Actual output: {:?}", String::from_utf8_lossy(&output.stdout));
 
     assert_eq!(
         String::from_utf8_lossy(&output.stdout),
