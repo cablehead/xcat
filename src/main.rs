@@ -15,28 +15,39 @@ struct Args {
     tiktoken: Option<usize>,
 }
 
+fn spawn_command<I: IntoIterator<Item = String>>(args: &Args, chunks: I) {
+    let mut p = std::process::Command::new(&args.command)
+        .args(&args.args)
+        .stdin(std::process::Stdio::piped())
+        .spawn()
+        .unwrap();
+
+    let mut stdin = p.stdin.take().unwrap();
+    for chunk in chunks {
+        writeln!(stdin, "{}", chunk).unwrap();
+    }
+    drop(stdin);
+    p.wait().unwrap();
+}
+
 fn main() {
     let args = Args::parse();
     let stdin = std::io::stdin();
 
-    let bpe = cl100k_base().unwrap();
+    let _bpe = cl100k_base().unwrap();
 
-    if let Some(token_limit) = args.tiktoken {
-        // Handle tiktoken option
+    if let Some(_token_limit) = args.tiktoken {
+        let mut buffer = String::new();
+        stdin.read_to_string(&mut buffer).expect("Failed to read from stdin");
+
+        let tokens = _bpe.encode_with_special_tokens(&buffer);
+        let chunks = tokens.chunks(_token_limit).map(|chunk| {
+            chunk.iter().map(|token| token.to_string()).collect::<Vec<_>>().join(" ")
+        });
+
+        spawn_command(&args, chunks);
     } else {
-        for line in stdin.lock().lines() {
-            let line = line.unwrap();
-
-            let mut p = std::process::Command::new(&args.command)
-                .args(&args.args)
-                .stdin(std::process::Stdio::piped())
-                .spawn()
-                .unwrap();
-
-            let mut stdin = p.stdin.take().unwrap();
-            writeln!(stdin, "{}", line).unwrap();
-            drop(stdin);
-            p.wait().unwrap();
-        }
+        let lines = stdin.lock().lines().map(|line| line.unwrap());
+        spawn_command(&args, lines);
     }
 }
