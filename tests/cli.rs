@@ -1,5 +1,5 @@
-use std::process::{Command, Stdio};
 use std::io::Write;
+use std::process::{Command, Stdio};
 
 #[test]
 fn test_program() {
@@ -13,24 +13,22 @@ fn test_program() {
         .spawn()
         .unwrap();
 
-    child.stdin.as_mut().unwrap().write_all(input.as_bytes()).unwrap();
+    child
+        .stdin
+        .as_mut()
+        .unwrap()
+        .write_all(input.as_bytes())
+        .unwrap();
     let output = child.wait_with_output().unwrap();
 
-    let expected_output = vec!["14", "13", "17"];
+    let want = vec!["14", "13", "17"];
 
-    let output_str = String::from_utf8_lossy(&output.stdout);
-    let actual_output = output_str
+    let res = String::from_utf8_lossy(&output.stdout);
+    let got = res
         .split('\n')
         .map(|s| s.trim())
         .filter(|s| !s.is_empty())
         .collect::<Vec<_>>();
 
-    println!("Expected output: {:?}", expected_output);
-    println!("Actual output: {:?}", actual_output);
-
-    assert_eq!(
-        actual_output,
-        expected_output,
-        "Program output does not match expected output"
-    );
+    assert_eq!(got, want);
 }
