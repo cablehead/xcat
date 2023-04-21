@@ -18,8 +18,9 @@ Options:
 
 When the `--tiktoken <N>` option is present, instead of dividing stdin by
 newlines, it divides it by chunks up to `N` tokens long. It currently
-cl100k_base	encoding, suitable for the ChatGPT models and
-text-embedding-ada-002.
+uses the 
+[`cl100k_base`](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb) 
+encoding suitable for the ChatGPT models and text-embedding-ada-002.
 
 ## Examples
 
