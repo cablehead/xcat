@@ -54,7 +54,7 @@ fn test_tiktoken_option() {
         .unwrap();
     let output = child.wait_with_output().unwrap();
 
-    let want = vec!["This is an example", "of using the tiktoken option", "."];
+    let want = vec!["This is an example of", "using the tiktoken option", "."];
 
     let res = String::from_utf8_lossy(&output.stdout);
     let got = res

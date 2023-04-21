@@ -43,7 +43,7 @@ fn main() {
 
         let tokens = bpe.encode_with_special_tokens(&buffer);
         let chunks = tokens.chunks(token_limit).map(|chunk| {
-            bpe.decode(chunk).unwrap()
+            bpe.decode(chunk.to_vec()).unwrap()
         });
 
         spawn_command(&args, chunks);
