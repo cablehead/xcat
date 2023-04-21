@@ -35,15 +35,15 @@ fn main() {
     let args = Args::parse();
     let mut stdin = std::io::stdin();
 
-    let _bpe = cl100k_base().unwrap();
+    let bpe = cl100k_base().unwrap();
 
-    if let Some(_token_limit) = args.tiktoken {
+    if let Some(token_limit) = args.tiktoken {
         let mut buffer = String::new();
         stdin.read_to_string(&mut buffer).expect("Failed to read from stdin");
 
-        let tokens = _bpe.encode_with_special_tokens(&buffer);
-        let chunks = tokens.chunks(_token_limit).map(|chunk| {
-            chunk.iter().map(|token| token.to_string()).collect::<Vec<_>>().join(" ")
+        let tokens = bpe.encode_with_special_tokens(&buffer);
+        let chunks = tokens.chunks(token_limit).map(|chunk| {
+            bpe.decode(chunk).unwrap()
         });
 
         spawn_command(&args, chunks);
