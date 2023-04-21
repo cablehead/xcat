@@ -40,21 +40,22 @@ fn main() {
         let mut tokens = Vec::new();
 
         Box::new(std::iter::from_fn(move || {
-            while tokens.len() >= token_limit {
-                let chunk = bpe.decode(tokens[..token_limit].to_vec()).unwrap();
-                tokens.drain(..token_limit);
-                return Some(chunk);
+            let decode_and_drain = |t: &mut Vec<_>| {
+                let chunk = bpe.decode(t[..token_limit].to_vec()).unwrap();
+                t.drain(..token_limit);
+                Some(chunk)
+            };
+
+            if tokens.len() >= token_limit {
+                return decode_and_drain(&mut tokens);
             }
 
             while reader.read_line(&mut buffer).unwrap() > 0 {
-                let new_tokens = bpe.encode_with_special_tokens(&buffer);
-                tokens.extend(new_tokens);
+                tokens.extend(bpe.encode_with_special_tokens(&buffer));
                 buffer.clear();
 
                 if tokens.len() >= token_limit {
-                    let chunk = bpe.decode(tokens[..token_limit].to_vec()).unwrap();
-                    tokens.drain(..token_limit);
-                    return Some(chunk);
+                    return decode_and_drain(&mut tokens);
                 }
             }
 
