@@ -41,8 +41,7 @@ fn main() {
 
         Box::new(std::iter::from_fn(move || {
             let decode_and_drain = |t: &mut Vec<_>| {
-                let chunk = bpe.decode(t[..token_limit].to_vec()).unwrap();
-                t.drain(..token_limit);
+                let chunk = bpe.decode(t.drain(..t.len().min(token_limit)).collect()).unwrap();
                 Some(chunk)
             };
 
@@ -60,9 +59,7 @@ fn main() {
             }
 
             if !tokens.is_empty() {
-                let chunk = bpe.decode(tokens.clone()).unwrap();
-                tokens.clear();
-                return Some(chunk);
+                return decode_and_drain(&mut tokens);
             }
 
             None
