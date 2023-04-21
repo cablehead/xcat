@@ -10,6 +10,8 @@ struct Args {
     command: String,
     #[clap(value_parser)]
     args: Vec<String>,
+
+    /// Divide stdin by chunks up to N tokens long
     #[clap(long, value_parser)]
     tiktoken: Option<usize>,
 }
@@ -42,7 +44,7 @@ fn main() {
         Box::new(std::iter::from_fn(move || {
             let decode_and_drain = |t: &mut Vec<_>| {
                 let chunk = bpe.decode(t.drain(..t.len().min(token_limit)).collect()).unwrap();
-                Some(chunk)
+                Some(chunk.trim().to_string())
             };
 
             if tokens.len() >= token_limit {

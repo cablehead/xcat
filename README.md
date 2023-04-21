@@ -1,14 +1,16 @@
 # xcat
 
 ```bash
-Usage: xcat [--tiktoken <N>] <COMMAND> [ARGS]...
-
-Options:
-  --tiktoken <N>    Divide stdin by chunks up to N tokens long
+Usage: xcat [OPTIONS] <COMMAND> [ARGS]...
 
 Arguments:
-  <COMMAND>  
-  [ARGS]...  
+  <COMMAND>
+  [ARGS]...
+
+Options:
+      --tiktoken <TIKTOKEN>  Divide stdin by chunks up to N tokens long
+  -h, --help                 Print help
+  -V, --version              Print version
 ```
 
 `xcat` reads from its `stdin`. For each line read, it spawns `<COMMAND>` with
@@ -19,7 +21,7 @@ newlines, it divides it by chunks up to `N` tokens long. It currently
 cl100k_base	encoding, suitable for the ChatGPT models and
 text-embedding-ada-002.
 
-## Example
+## Examples
 
 ```bash
 $ cat Cargo.toml | xcat -- wc -c
@@ -33,7 +35,8 @@ $ cat Cargo.toml | xcat -- wc -c
 ```
 
 ```bash
-$ echo "This is an example of using the tiktoken option." | xcat --tiktoken 5 -- wc -w
-       5
-       4
+$ echo "This is an example of using the tiktoken option." | xcat --tiktoken 5 -- cat
+This is an example of
+using the tiktoken option
+.
 ```
